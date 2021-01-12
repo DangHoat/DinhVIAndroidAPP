@@ -1,48 +1,69 @@
-package hung.hust.doanhung;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+package hung.hust.doanhung.UI;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import hung.hust.doanhung.databinding.FragmentControlBinding;
 import hung.hust.doanhung.define.Constans;
 import hung.hust.doanhung.mylocation.GPSTracker;
 import hung.hust.doanhung.service.LocationService;
 
-public class MainActivity extends AppCompatActivity {
+
+public class fragment_control  extends Fragment {
+    Context context;
     private GPSTracker gpsTracker;
-
+    FragmentControlBinding binding;
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentControlBinding.inflate(inflater,container,false);
+        context = getContext();
+        View v = binding.getRoot();
+        binding.btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                if (ContextCompat.checkSelfPermission(context,
                         android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
                 }else {
                     startLocation();
                 }
+
             }
         });
-
-        findViewById(R.id.btn_stop).setOnClickListener(new View.OnClickListener() {
+        binding.btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopLocation();
             }
         });
+        binding.btnLocate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocation();
+            }
+        });
+        return v;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 
     @Override
@@ -55,15 +76,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void getLocation(View view){
-        gpsTracker = new GPSTracker(MainActivity.this);
+    public void getLocation(){
+        gpsTracker = new GPSTracker(getContext());
         if(gpsTracker.canGetLocation()){
             double latitude = gpsTracker.getLatitude();
             double longitude = gpsTracker.getLongitude();
             Toast.makeText(
-                        this,
+                    context,
                     "latitude :" + Double.toString(latitude) +"\n"
-                    +"longitude :" + Double.toString(longitude),
+                            +"longitude :" + Double.toString(longitude),
                     Toast.LENGTH_LONG
             ).show();
         }else{
@@ -71,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private boolean isServiceRuning(){
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager)getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         if(activityManager!= null){
             for (ActivityManager.RunningServiceInfo serviceInfo:
                     activityManager.getRunningServices(Integer.MAX_VALUE)){
@@ -85,18 +106,18 @@ public class MainActivity extends AppCompatActivity {
     }
     public void startLocation(){
         if(!isServiceRuning()){
-            Intent i =  new Intent(getApplicationContext(), LocationService.class);
+            Intent i =  new Intent(getContext(), LocationService.class);
             i.setAction(Constans.LOCATION_START);
-            startService(i);
-            Toast.makeText(this,"Bắt đầu chạy service",Toast.LENGTH_LONG).show();
+            getActivity().startService(i);
+            Toast.makeText(context,"Bắt đầu chạy service",Toast.LENGTH_LONG).show();
         }
     }
     public void stopLocation(){
         if(isServiceRuning()){
-            Intent i =  new Intent(getApplicationContext(), LocationService.class);
+            Intent i =  new Intent(context, LocationService.class);
             i.setAction(Constans.LOCATION_STOP);
-            startService(i);
-            Toast.makeText(this,"Dừng chạy service",Toast.LENGTH_LONG).show();
+            context.startService(i);
+            Toast.makeText(context,"Dừng chạy service",Toast.LENGTH_LONG).show();
         }
     }
 }
