@@ -16,6 +16,9 @@ public class fragment_login  extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        binding = FragmentLoginBinding.inflate(inflater,container,false);
+        View v =  binding.getRoot();
+
+        return v;
     }
 }

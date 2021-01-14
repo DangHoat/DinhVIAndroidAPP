@@ -39,7 +39,7 @@ public class fragment_map extends Fragment {
                 LatLng latLng = getLocation();
                 markerOptions.position(latLng);
                 markerOptions.title("lat : "+latLng.latitude+""+"log : "+latLng.longitude);
-                
+
                 googleMap.clear();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10000));
                 googleMap.addMarker(markerOptions);

@@ -21,12 +21,12 @@ public class SoketIO {
     }
 
     public SoketIO() {
-        if(getmSocket()!=null){
+        if(getSocket()!=null){
             mSocket.connect();
         }
     }
 
-    public static Socket getmSocket() {
+    public static Socket getSocket() {
         return mSocket;
     }
     public void socketSendGPS(JSONObject data){
